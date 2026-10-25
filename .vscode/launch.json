@@ -1,0 +1,17 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "TiendaAppApplication",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.JuanAndresFelipe.TiendaApp.TiendaAppApplication",
+            "projectName": "TiendaApp",
+            "args": "",
+            "env": {
+                "env.jwt.secret-key": "Q+XbFsja+I+3oxk+NiHKo3EFebTsKhlQmzwD7jlvOCQ=",
+                "env.jwt.token-expiration": 600000
+            }
+        }
+    ]
+}
