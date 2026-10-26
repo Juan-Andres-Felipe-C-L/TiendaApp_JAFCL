@@ -2,6 +2,8 @@ package com.JuanAndresFelipe.TiendaApp.entity;
 
 import java.util.List;
 
+import com.JuanAndresFelipe.TiendaApp.enums.RoleEnum;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -39,7 +41,7 @@ public class Users {
 
     @ManyToOne (cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "rol_id", referencedColumnName = "id")
-    private Roles role;
+    private RoleEnum role;
 
     @OneToMany(mappedBy = "seller")
     private List<Products> products;

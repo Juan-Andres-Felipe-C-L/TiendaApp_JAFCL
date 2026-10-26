@@ -3,6 +3,8 @@ package com.JuanAndresFelipe.TiendaApp.entity;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.JuanAndresFelipe.TiendaApp.enums.OrderStatusEnum;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -41,7 +43,7 @@ public class Orders {
     private double total;
 
     @Column(name = "status")
-    private String status;
+    private OrderStatusEnum status;
 
     @Column(
     name = "created_at",

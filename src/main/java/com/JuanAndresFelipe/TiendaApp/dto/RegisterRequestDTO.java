@@ -1,5 +1,7 @@
 package com.JuanAndresFelipe.TiendaApp.dto;
 
+import com.JuanAndresFelipe.TiendaApp.enums.RoleEnum;
+
 import lombok.Data;
 
 @Data 
@@ -11,5 +13,5 @@ public class RegisterRequestDTO {
 
     private String password;
 
-    private int rolId;
+    private RoleEnum role;
 }

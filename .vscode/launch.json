@@ -2,6 +2,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "AdminsPassword",
+            "request": "launch",
+            "mainClass": "com.JuanAndresFelipe.TiendaApp.AdminsPassword",
+            "projectName": "TiendaApp"
+        },
+        {
+            "type": "java",
             "name": "TiendaAppApplication",
             "request": "launch",
             "cwd": "${workspaceFolder}",
