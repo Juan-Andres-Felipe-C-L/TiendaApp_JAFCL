@@ -7,7 +7,8 @@ public enum OrderStatusEnum {
     
     PENDIENTE("PENDIENTE"),
     ENVIADO("ENVIADO"),
-    ENTREGADO("ENTREGADO");
+    ENTREGADO("ENTREGADO"),
+    CANCELADO("CANCELADO");
 
     private final String status;
 
