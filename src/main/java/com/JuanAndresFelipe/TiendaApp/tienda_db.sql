@@ -44,6 +44,17 @@ CREATE TABLE orders(
   foreign key (client_id) references users (id),
   foreign key (product_id) references products (id)
 );
+
+CREATE TABLE order_products (
+    order_id INT NOT NULL,
+    product_id INT NOT NULL,
+    PRIMARY KEY (order_id, product_id),
+    FOREIGN KEY (order_id) REFERENCES orders(id),
+    FOREIGN KEY (product_id) REFERENCES products(id)
+);
+
+-- Se pone sentencia para poder actualizar la información de las tablas, apesar de usar relaciones de Foreign Keys: 
+set sql_safe_updates = 0;
  
 INSERT INTO roles (name) VALUES ('ADMIN'), ('CLIENTE'), ('VENDEDOR');
 

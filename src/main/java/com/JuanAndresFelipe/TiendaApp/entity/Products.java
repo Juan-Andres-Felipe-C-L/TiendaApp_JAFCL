@@ -1,5 +1,7 @@
 package com.JuanAndresFelipe.TiendaApp.entity;
 
+import java.util.List;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -8,8 +10,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
 
@@ -43,6 +45,6 @@ public class Products {
     @JoinColumn(name = "seller_id", referencedColumnName = "id")
     private Users seller;
 
-    @OneToMany(mappedBy = "products")
-    private Orders order;
+    @ManyToMany(mappedBy = "products", fetch = FetchType.LAZY)
+    private List<Orders> orders;
 }
