@@ -13,5 +13,5 @@ public class RegisterRequestDTO {
 
     private String password;
 
-    private RoleEnum role;
+    private Long roleId;
 }
