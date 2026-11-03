@@ -1,7 +1,5 @@
 package com.JuanAndresFelipe.TiendaApp.dto;
 
-import com.JuanAndresFelipe.TiendaApp.enums.RoleEnum;
-
 import lombok.Data;
 
 @Data 
