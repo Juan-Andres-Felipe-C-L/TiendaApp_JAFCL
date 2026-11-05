@@ -35,7 +35,7 @@ public class Users {
     private String password;
 
     @Column (name = "active")
-    private boolean active;
+    private boolean active = true;
 
     @ManyToOne (cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "rol_id", referencedColumnName = "id")

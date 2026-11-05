@@ -5,10 +5,10 @@ import java.util.Optional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.JuanAndresFelipe.TiendaApp.dto.ClientRegisterRequestDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.HttpGlobalResponseDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.LoginRequestDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.LoginResponseDTO;
-import com.JuanAndresFelipe.TiendaApp.dto.RegisterRequestDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.UserDTO;
 import com.JuanAndresFelipe.TiendaApp.entity.Roles;
 import com.JuanAndresFelipe.TiendaApp.entity.Users;
@@ -30,20 +30,20 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
 
     /**
-     * Método que hacer posible que un cliente se registre en la aplicación.
+     * Método que hace posible que un cliente se registre en la aplicación.
      * 
      * @param request es un DTO con los atributos necesarios para hacer un registro
      *                de un usuario.
      * @return Se devuelve un DTO con cierta información del usuario que se acaba de
      *         registrar y un mensaje que corrobora si el registro fue exitoso.
      */
-    public HttpGlobalResponseDTO<UserDTO> register(RegisterRequestDTO request) {
+    public HttpGlobalResponseDTO<UserDTO> register(ClientRegisterRequestDTO request) {
         HttpGlobalResponseDTO<UserDTO> response = new HttpGlobalResponseDTO<>();
         UserDTO userDTO = new UserDTO();
 
         Optional<Users> usernameFound = usersRepository.findByUsername(request.getUsername());
         Optional<Users> emailFound = usersRepository.findByEmail(request.getEmail());
-        Optional<Roles> rolFound = rolesRepository.findById(request.getRoleId());
+        Optional<Roles> rolFound = rolesRepository.findById(2L);
 
         if (usernameFound.isPresent()) {
             response.setMessage("El nombre de usuario ya está en uso.");
@@ -52,11 +52,6 @@ public class AuthService {
 
         if (emailFound.isPresent()) {
             response.setMessage("El correo de usuario ya está en uso.");
-            return response;
-        }
-
-        if (rolFound.isEmpty()) {
-            response.setMessage("El rol registrado no existe.");
             return response;
         }
 
