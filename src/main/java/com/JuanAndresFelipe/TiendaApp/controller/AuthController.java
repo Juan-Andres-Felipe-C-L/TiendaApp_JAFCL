@@ -55,7 +55,13 @@ public class AuthController {
     public ResponseEntity<HttpGlobalResponseDTO<LoginResponseDTO>> login(@RequestBody LoginRequestDTO request) {
         try {
             HttpGlobalResponseDTO<LoginResponseDTO> response = authService.login(request);
-            return ResponseEntity.status(HttpStatus.OK).body(response);
+
+            if (response.getData() == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            } else {
+                return ResponseEntity.status(HttpStatus.OK).body(response);
+            }
+            
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);

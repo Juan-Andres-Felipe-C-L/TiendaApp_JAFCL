@@ -108,6 +108,11 @@ public class AuthService {
             return response;
         }
 
+        if (!userFound.isActive()) {
+            response.setMessage("Este usuario ha sido inactivado.");
+            return response;
+        }
+
         String jwt = jwtService.generateToken(userFound.getId(), userFound.getUsername(), userFound.getRole().getId());
         LoginResponseDTO token = new LoginResponseDTO();
 
