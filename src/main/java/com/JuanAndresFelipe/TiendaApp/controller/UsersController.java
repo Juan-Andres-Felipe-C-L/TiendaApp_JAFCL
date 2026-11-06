@@ -5,10 +5,13 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.JuanAndresFelipe.TiendaApp.dto.HttpGlobalResponseDTO;
+import com.JuanAndresFelipe.TiendaApp.dto.RegisterRequestDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.UserDTO;
 import com.JuanAndresFelipe.TiendaApp.enums.RoleEnum;
 import com.JuanAndresFelipe.TiendaApp.security.RequiresRole;
@@ -33,6 +36,29 @@ public class UsersController {
         try {
             HttpGlobalResponseDTO<List<UserDTO>> response = usersService.getUsers();
             return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
+
+    /**
+     * Método para que un administrador pueda registrar un usuario en la aplicación, otorgandole cualquier tipo de rol.
+     * @param request: Es un DTO que tiene la información necesaria del usuario para que este pueda ser registrado por un administrador.
+     * @return un "ResponseEntity" que muestra un estatus Http, un mensaje y algunos datos del usuario que se registró.
+     */
+    @PostMapping()
+    @RequiresRole(RoleEnum.ADMIN)
+    public ResponseEntity<HttpGlobalResponseDTO<UserDTO>> register(@RequestBody RegisterRequestDTO request) {
+        try {
+            HttpGlobalResponseDTO<UserDTO> response = usersService.register(request);
+            
+            if (response.getData() == null) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+            } else {
+                return ResponseEntity.status(HttpStatus.CREATED).body(response);
+            }
+            
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
