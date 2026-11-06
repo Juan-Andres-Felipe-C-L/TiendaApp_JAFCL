@@ -33,7 +33,13 @@ public class AuthController {
     public ResponseEntity<HttpGlobalResponseDTO<UserDTO>> register(@RequestBody ClientRegisterRequestDTO request) {
         try {
             HttpGlobalResponseDTO<UserDTO> response = authService.register(request);
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+            
+            if (response.getData() == null) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+            } else {
+                return ResponseEntity.status(HttpStatus.CREATED).body(response);
+            }
+            
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
