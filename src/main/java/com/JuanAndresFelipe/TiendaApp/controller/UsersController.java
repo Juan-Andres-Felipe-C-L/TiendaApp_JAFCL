@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.JuanAndresFelipe.TiendaApp.dto.ChangeRoleDTO;
+import com.JuanAndresFelipe.TiendaApp.dto.ChangeStatusDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.HttpGlobalResponseDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.RegisterRequestDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.UserDTO;
@@ -76,9 +77,28 @@ public class UsersController {
      */
     @PatchMapping("/{id}/role")
     @RequiresRole(RoleEnum.ADMIN)
-    public ResponseEntity<HttpGlobalResponseDTO<UserDTO>> changeId(@PathVariable Long id, @RequestBody ChangeRoleDTO request) {
+    public ResponseEntity<HttpGlobalResponseDTO<UserDTO>> changeRoleId(@PathVariable Long id, @RequestBody ChangeRoleDTO request) {
         try {
-            HttpGlobalResponseDTO<UserDTO> response = usersService.changeId(id, request);
+            HttpGlobalResponseDTO<UserDTO> response = usersService.changeRoleId(id, request);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
+
+    /**
+     * Método para que los administradores puedan cambiar el valor de "activado" de las cuentas de usuarios de la aplicación.
+     * @param id es el I.D. del usaurio a quien se le quiere editar sus datos.
+     * @param request es el DTO utilizado para recibir el nuevo estado del usuario.
+     * @return un "ResponseEntity" que trae un mensaje y algunos de los datos del usuario a quien se le hizo el cambio. También, se confirma si el cambio fue éxitoso.
+     */
+    @PatchMapping("/{id}/status")
+    @RequiresRole(RoleEnum.ADMIN)
+    public ResponseEntity<HttpGlobalResponseDTO<UserDTO>> changeStatus(@PathVariable Long id, @RequestBody ChangeStatusDTO request) {
+        try {
+            HttpGlobalResponseDTO<UserDTO> response = usersService.changeStatus(id, request);
             return ResponseEntity.status(HttpStatus.OK).body(response);
             
         } catch (Exception e) {

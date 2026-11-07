@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import com.JuanAndresFelipe.TiendaApp.dto.ChangeRoleDTO;
+import com.JuanAndresFelipe.TiendaApp.dto.ChangeStatusDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.HttpGlobalResponseDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.RegisterRequestDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.UserDTO;
@@ -112,7 +113,7 @@ public class UsersService {
      * @param request es un DTO para ingresar el dato nuevo del I.D. del usuario a quien se quiere actualizar.
      * @return Se retorna un DTO con un mensaje y algunos datos del usuario a quien se le está haciendo la actualización.
      */
-    public HttpGlobalResponseDTO<UserDTO> changeId(Long id, ChangeRoleDTO request ) {
+    public HttpGlobalResponseDTO<UserDTO> changeRoleId(Long id, ChangeRoleDTO request ) {
         HttpGlobalResponseDTO<UserDTO> response = new HttpGlobalResponseDTO<>();
         UserDTO userDTO = new UserDTO();
 
@@ -129,6 +130,11 @@ public class UsersService {
             return response;
         }
 
+        if (userFound.get().getRole().getId() == request.getNewRoleId()) {
+            response.setMessage("El rol que quiere cambiar a este usuario es el mismo que éste ya tiene.");
+            return response;
+        }
+
         Users user = userFound.get();
         user.setRole(roleFound.get());
 
@@ -140,7 +146,46 @@ public class UsersService {
         userDTO.setRolId(user.getRole().getName());
         userDTO.setActive(user.isActive());
 
-        response.setMessage("I.D. de usuario actualizado correctamente.");
+        response.setMessage("El rol del usuario fue actualizado correctamente.");
+        response.setData(userDTO);
+
+        return response;    
+    }
+
+    /**
+     * Método para que se pueda cambiar el valor de "activado" de las cuentas de los usuarios de la aplicación.
+     * @param id es el I.D. del usaurio a quien se le quiere editar sus datos.
+     * @param request es el DTO utilizado para recibir el nuevo estado del usuario.
+     * @return un DTO que trae un mensaje y algunos de los datos del usuario a quien se le hizo el cambio. Aquí se confirma si el cambio fue realizado con éxito.
+     */
+    public HttpGlobalResponseDTO<UserDTO> changeStatus(Long id, ChangeStatusDTO request ) {
+        HttpGlobalResponseDTO<UserDTO> response = new HttpGlobalResponseDTO<>();
+        UserDTO userDTO = new UserDTO();
+
+        Optional<Users> userFound = usersRepository.findById(id);
+
+        if (userFound.isEmpty()) {
+            response.setMessage("No existe un usuario registrado en esta aplicación con ese I.D. escrito.");
+            return response;
+        }
+
+        if (userFound.get().isActive() == request.isNewStatus()) {
+            response.setMessage("El usuario que quiere cambiar ya tiene ese status.");
+            return response;
+        }
+
+        Users user = userFound.get();
+        user.setActive(request.isNewStatus());
+
+        usersRepository.save(user);
+
+        userDTO.setId(user.getId());
+        userDTO.setUsername(user.getUsername());
+        userDTO.setEmail(user.getEmail());
+        userDTO.setRolId(user.getRole().getName());
+        userDTO.setActive(user.isActive());
+
+        response.setMessage("El status del usuario fue actualizado correctamente.");
         response.setData(userDTO);
 
         return response;    
