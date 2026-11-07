@@ -5,11 +5,14 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.JuanAndresFelipe.TiendaApp.dto.ChangeRoleDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.HttpGlobalResponseDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.RegisterRequestDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.UserDTO;
@@ -58,6 +61,25 @@ public class UsersController {
             } else {
                 return ResponseEntity.status(HttpStatus.CREATED).body(response);
             }
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
+
+    /**
+     * Método para que un administrador pueda cambiar el rol de un usuario registrado.
+     * @param id es el I.D. del usuario a quien se le quiere hacer la actualización.
+     * @param request es un DTO utilizado para ingresar el I.D. del nuevo rol del usuario a quien se le quiere hacer la edición.
+     * @return un "ResponseEntity" con un Http status, un mensaje y la información del usuario y su nuevo rol.
+     */
+    @PatchMapping("/{id}/role")
+    @RequiresRole(RoleEnum.ADMIN)
+    public ResponseEntity<HttpGlobalResponseDTO<UserDTO>> changeId(@PathVariable Long id, @RequestBody ChangeRoleDTO request) {
+        try {
+            HttpGlobalResponseDTO<UserDTO> response = usersService.changeId(id, request);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
             
         } catch (Exception e) {
             e.printStackTrace();

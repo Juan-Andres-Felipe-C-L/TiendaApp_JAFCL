@@ -4,9 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PathVariable;
 
+import com.JuanAndresFelipe.TiendaApp.dto.ChangeRoleDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.HttpGlobalResponseDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.RegisterRequestDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.UserDTO;
@@ -101,5 +104,45 @@ public class UsersService {
         response.setData(userDTO);
 
         return response;
+    }
+
+    /**
+     * Método para cambiar el rol de un usuario existente en la aplicación.
+     * @param id es el I.D. del usuario a quien se le quiere hacer el cambio.
+     * @param request es un DTO para ingresar el dato nuevo del I.D. del usuario a quien se quiere actualizar.
+     * @return Se retorna un DTO con un mensaje y algunos datos del usuario a quien se le está haciendo la actualización.
+     */
+    public HttpGlobalResponseDTO<UserDTO> changeId(Long id, ChangeRoleDTO request ) {
+        HttpGlobalResponseDTO<UserDTO> response = new HttpGlobalResponseDTO<>();
+        UserDTO userDTO = new UserDTO();
+
+        Optional<Users> userFound = usersRepository.findById(id);
+        Optional<Roles> roleFound = rolesRepository.findById(request.getNewRoleId());
+
+        if (userFound.isEmpty()) {
+            response.setMessage("No existe un usuario registrado en esta aplicación con ese I.D. escrito.");
+            return response;
+        }
+
+        if (roleFound.isEmpty()) {
+            response.setMessage("El tipo de rol que ha escrito para el usuario no existe.");
+            return response;
+        }
+
+        Users user = userFound.get();
+        user.setRole(roleFound.get());
+
+        usersRepository.save(user);
+
+        userDTO.setId(user.getId());
+        userDTO.setUsername(user.getUsername());
+        userDTO.setEmail(user.getEmail());
+        userDTO.setRolId(user.getRole().getName());
+        userDTO.setActive(user.isActive());
+
+        response.setMessage("I.D. de usuario actualizado correctamente.");
+        response.setData(userDTO);
+
+        return response;    
     }
 }
