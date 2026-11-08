@@ -21,7 +21,9 @@ import com.JuanAndresFelipe.TiendaApp.enums.RoleEnum;
 import com.JuanAndresFelipe.TiendaApp.security.RequiresRole;
 import com.JuanAndresFelipe.TiendaApp.service.UsersService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -29,6 +31,36 @@ import lombok.RequiredArgsConstructor;
 public class UsersController {
     
     private final UsersService usersService;
+
+    /**
+     * Método para que todos los usuarios puedan acceder a la información del perfil de su cuenta.
+     * @param request es la petición del usuario que se pasa para poder obtener el token y de ahí, el atributo "userId".
+     * @return un "ResponseEntity" que tiene un HTTP status, un mensaje y la información del perfil del usuario.
+     */
+    @GetMapping("/me")
+    @RequiresRole({RoleEnum.ADMIN, RoleEnum.VENDEDOR, RoleEnum.CLIENTE})
+    public ResponseEntity<HttpGlobalResponseDTO<UserDTO>> getMyProfile(HttpServletRequest request) {
+        HttpGlobalResponseDTO<UserDTO> response = new HttpGlobalResponseDTO<>();
+        
+        String authHeader = request.getHeader("Authorization");
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            response.setMessage("Token invalido.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+
+        String token = authHeader.replace("Bearer ", "");
+        
+        try {
+            response = usersService.getMyProfile(token);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
+    
 
     /**
      * Método para que los administradores obtengan una lista de los usuarios que hay registrados en la aplicacion.

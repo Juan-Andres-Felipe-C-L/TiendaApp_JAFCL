@@ -4,10 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import com.JuanAndresFelipe.TiendaApp.dto.ChangeRoleDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.ChangeStatusDTO;
@@ -30,6 +28,38 @@ public class UsersService {
     private final RolesRepository rolesRepository;
 
     private final PasswordEncoder passwordEncoder;
+
+    private final JwtService jwtService;
+
+    /**
+     * Método para que todos los usuarios puedan acceder a la información del perfil de su cuenta.
+     * @param token es el JWT token extraido de la petición del usuario en formato de un String.
+     * @return un DTO que tiene un mensaje y la información del perfil del usuario.
+     */    
+    public HttpGlobalResponseDTO<UserDTO> getMyProfile(String token) {
+        HttpGlobalResponseDTO<UserDTO> response = new HttpGlobalResponseDTO<>();
+        UserDTO userDTO = new UserDTO();        
+
+        Long userId = jwtService.extractUserId(token);
+
+        Optional<Users> userFound = usersRepository.findById(userId);
+
+        if (userFound.isEmpty()) {
+            response.setMessage("Hubo un error en el desarrollo de la petición.");
+            return response;
+        }
+
+        userDTO.setId(userFound.get().getId());
+        userDTO.setUsername(userFound.get().getUsername());
+        userDTO.setEmail(userFound.get().getEmail());
+        userDTO.setRolId(userFound.get().getRole().getName());
+        userDTO.setActive(userFound.get().isActive());
+
+        response.setData(userDTO);
+        response.setMessage("Estos son los datos del perfil de su usuario.");
+
+        return response;
+    }
     
     /**
      * Método para obtener todos los usuarios registrados en la aplicación.
