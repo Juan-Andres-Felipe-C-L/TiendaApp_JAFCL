@@ -27,6 +27,10 @@ public class CategoriesController {
 
     private final CategoriesService categoriesService;
     
+    /**
+     * Método que pueden usar todos los usuarios de la aplicación para averiguar cuáles son las categorías de productos que se venden en este sistema.  
+     * @return un "ResponseEntity" que indica un çódigo Http y muestra una lista de las categorías con su información, y además, un mensaje.
+     */
     @GetMapping()
     @RequiresRole({RoleEnum.ADMIN, RoleEnum.VENDEDOR, RoleEnum.CLIENTE})
     public ResponseEntity<HttpGlobalResponseDTO<List<CategoriesResponseDTO>>> getCategories() {
