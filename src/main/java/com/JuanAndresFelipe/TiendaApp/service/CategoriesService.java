@@ -2,9 +2,11 @@ package com.JuanAndresFelipe.TiendaApp.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.JuanAndresFelipe.TiendaApp.dto.CategoriesRequestDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.CategoriesResponseDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.HttpGlobalResponseDTO;
 import com.JuanAndresFelipe.TiendaApp.entity.Categories;
@@ -38,6 +40,36 @@ public class CategoriesService {
 
         response.setData(listDTO);
         response.setMessage("Estas son la categorias registradas hasta ahora.");
+
+        return response;
+    }
+
+    /**
+     * Método para registar una nueva categoría en el sistema.
+     * @param request es un DTO para brindar la información de la nueva categoría.
+     * @return un DTO global con la información de la nueva categoría registrada y un mensaje.
+     */
+    public HttpGlobalResponseDTO<CategoriesResponseDTO> registerCategory(CategoriesRequestDTO request) {
+        HttpGlobalResponseDTO<CategoriesResponseDTO> response = new HttpGlobalResponseDTO<>();
+        CategoriesResponseDTO categoryDTO = new CategoriesResponseDTO();
+
+        Optional<Categories> categoryFound = categoriesRepository.findByName(request.getName());
+
+        if (categoryFound.isPresent()) {
+            response.setMessage("Ya hay una categoría de productos registrada con ese nombre.");
+            return response;
+        }
+
+        Categories category = new Categories();
+        category.setName(request.getName());
+
+        categoriesRepository.save(category);
+
+        categoryDTO.setId(category.getId());
+        categoryDTO.setName(category.getName());
+
+        response.setData(categoryDTO);
+        response.setMessage("La categoría ha sido registrada exitosamente.");
 
         return response;
     }
