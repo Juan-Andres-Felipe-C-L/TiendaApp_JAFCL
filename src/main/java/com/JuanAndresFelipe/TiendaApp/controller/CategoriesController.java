@@ -17,7 +17,9 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -69,5 +71,29 @@ public class CategoriesController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
+    
+    /**
+     * Función para que un administrador pueda borrar una categoría sin productos en ella.
+     * @param id es el identificador único de la categoría que se quiere eliminar del sistema.
+     * @return un "ResponseEntity" que contiene: Un código Http, la información de la categoría que se quiere borrar y un mensaje que informa si la petición se logró correctamente.
+     */
+    @DeleteMapping("/{id}")
+    @RequiresRole(RoleEnum.ADMIN)
+    public ResponseEntity<HttpGlobalResponseDTO<CategoriesResponseDTO>> deleteCategory(@PathVariable Long id) {        
+        try {
+            HttpGlobalResponseDTO<CategoriesResponseDTO> response = categoriesService.deleteCategory(id);
+            
+            if (response.getData() == null) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+            } else {
+                return ResponseEntity.status(HttpStatus.OK).body(response);
+            }
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
+
     
 }

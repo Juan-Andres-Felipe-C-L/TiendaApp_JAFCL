@@ -10,7 +10,9 @@ import com.JuanAndresFelipe.TiendaApp.dto.CategoriesRequestDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.CategoriesResponseDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.HttpGlobalResponseDTO;
 import com.JuanAndresFelipe.TiendaApp.entity.Categories;
+import com.JuanAndresFelipe.TiendaApp.entity.Products;
 import com.JuanAndresFelipe.TiendaApp.repository.CategoriesRepository;
+import com.JuanAndresFelipe.TiendaApp.repository.ProductsRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,6 +21,8 @@ import lombok.RequiredArgsConstructor;
 public class CategoriesService {
     
     private final CategoriesRepository categoriesRepository;
+
+    private final ProductsRepository productsRepository;
 
     /**
      * Método que muestra todas las categorías de productos que hay en la aplicación.
@@ -70,6 +74,40 @@ public class CategoriesService {
 
         response.setData(categoryDTO);
         response.setMessage("La categoría ha sido registrada exitosamente.");
+
+        return response;
+    }
+
+    /**
+     * Método para poder remover una categoría de productos del sistema, si no tiene productos.
+     * @param id es el I.D. de la categoría que se quiere remover.
+     * @return un DTO que brinda la información de la categoría y un mensaje para confirmar se ella fue borrada con éxito.
+     */
+    public HttpGlobalResponseDTO<CategoriesResponseDTO> deleteCategory(Long id) {
+        HttpGlobalResponseDTO<CategoriesResponseDTO> response = new HttpGlobalResponseDTO<>();
+        CategoriesResponseDTO categoryDTO = new CategoriesResponseDTO();
+
+        Optional<Categories> categoryFound = categoriesRepository.findById(id);
+
+        if (categoryFound.isEmpty()) {
+            response.setMessage("El I.D. de categoría escrito no existe en el sistema.");
+            return response;
+        }
+
+        List<Products> productsFound = productsRepository.findAllByCategoryId(id);
+
+        if (productsFound.size() > 0) {
+            response.setMessage("Esta categoría de productos no se puede eliminar porque contiene productos en ella.");
+            return response;
+        }
+
+        categoryDTO.setId(categoryFound.get().getId());
+        categoryDTO.setName(categoryFound.get().getName());
+        response.setData(categoryDTO);
+
+        categoriesRepository.deleteById(id);
+        
+        response.setMessage("La categoría ha sido removida exitosamente.");
 
         return response;
     }
