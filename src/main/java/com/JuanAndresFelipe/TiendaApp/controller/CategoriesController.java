@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.JuanAndresFelipe.TiendaApp.dto.CategoriesRequestDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.CategoriesResponseDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.HttpGlobalResponseDTO;
-import com.JuanAndresFelipe.TiendaApp.dto.UserDTO;
 import com.JuanAndresFelipe.TiendaApp.enums.RoleEnum;
 import com.JuanAndresFelipe.TiendaApp.security.RequiresRole;
 import com.JuanAndresFelipe.TiendaApp.service.CategoriesService;
@@ -20,7 +19,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
