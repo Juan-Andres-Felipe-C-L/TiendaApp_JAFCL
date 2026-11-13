@@ -15,7 +15,11 @@ public class ProductsResponseDTO {
 
     private int stock;
 
-    private int categoryId;
+    private Long categoryId;
 
-    private int sellerId;
+    private String categoryName;
+
+    private Long sellerId;
+
+    private String sellerName;
 }

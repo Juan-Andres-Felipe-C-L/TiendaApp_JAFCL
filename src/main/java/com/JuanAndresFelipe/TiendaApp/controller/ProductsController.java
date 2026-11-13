@@ -2,7 +2,6 @@ package com.JuanAndresFelipe.TiendaApp.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import com.JuanAndresFelipe.TiendaApp.dto.CategoriesResponseDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.HttpGlobalResponseDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.ProductsResponseDTO;
 import com.JuanAndresFelipe.TiendaApp.service.ProductsService;
@@ -25,6 +24,11 @@ public class ProductsController {
     
     private final ProductsService productsService;
 
+    /**
+     * Método público para poder observar el catálogo de productos registrados en la aplicación.
+     * @param categoryId es un parámetro opcional para poder filtrar los productos por categorías.
+     * @return un "ResponseEntity" con código Http, dentro del cual va una lista de productos en formato de DTO.
+     */
     @GetMapping()
     public ResponseEntity<HttpGlobalResponseDTO<List<ProductsResponseDTO>>> getCatalogue(@RequestParam(required = false) Long categoryId) {
         try {
