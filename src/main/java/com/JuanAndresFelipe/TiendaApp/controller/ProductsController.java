@@ -4,8 +4,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.JuanAndresFelipe.TiendaApp.dto.HttpGlobalResponseDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.ProductsResponseDTO;
+import com.JuanAndresFelipe.TiendaApp.dto.UserDTO;
+import com.JuanAndresFelipe.TiendaApp.enums.RoleEnum;
+import com.JuanAndresFelipe.TiendaApp.security.RequiresRole;
 import com.JuanAndresFelipe.TiendaApp.service.ProductsService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -57,5 +61,32 @@ public class ProductsController {
         }
     }
     
-    
+    /**
+     * Método para que los vendedores puedan consultar sus productos que se venden en la aplicación.
+     * @param request toma la petición como parámetro para sacar el I.D. del vendedor del token JWT y utilizarlo.
+     * @return un "ResponseEntity" que contiene un Código Http, la lista de productos pertenecientes al vendedor y un mensaje.
+     */
+    @GetMapping("/mine")
+    @RequiresRole(RoleEnum.VENDEDOR)
+    public ResponseEntity<HttpGlobalResponseDTO<List<ProductsResponseDTO>>> getMyProducts(HttpServletRequest request) {
+        HttpGlobalResponseDTO<List<ProductsResponseDTO>> response = new HttpGlobalResponseDTO<>();
+        
+        String authHeader = request.getHeader("Authorization");
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            response.setMessage("Token invalido.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+
+        String token = authHeader.replace("Bearer ", "");
+        
+        try {
+            response = productsService.getMyProducts(token);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
 }

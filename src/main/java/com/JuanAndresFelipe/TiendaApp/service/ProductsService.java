@@ -8,8 +8,10 @@ import org.springframework.stereotype.Service;
 
 import com.JuanAndresFelipe.TiendaApp.dto.HttpGlobalResponseDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.ProductsResponseDTO;
+import com.JuanAndresFelipe.TiendaApp.dto.UserDTO;
 import com.JuanAndresFelipe.TiendaApp.entity.Categories;
 import com.JuanAndresFelipe.TiendaApp.entity.Products;
+import com.JuanAndresFelipe.TiendaApp.entity.Users;
 import com.JuanAndresFelipe.TiendaApp.repository.CategoriesRepository;
 import com.JuanAndresFelipe.TiendaApp.repository.ProductsRepository;
 
@@ -22,6 +24,8 @@ public class ProductsService {
     private final ProductsRepository productsRepository;
 
     private final CategoriesRepository categoriesRepository;
+
+    private final JwtService jwtService;
 
     /**
      * Método para traer una lista de los productos registrados en el sistema. También, estos pueden ser filtrados con el I.D. de la categoría de productos que se quieren ver.
@@ -114,6 +118,45 @@ public class ProductsService {
 
         response.setData(productDTO);
         response.setMessage("Producto obtenido al consultar el I.D. número: " + Id + ".");
+        return response;
+    }
+
+    /**
+     * Método para que los vendedores puedan consultar sus productos en la aplicación.
+     * @param token JWT es un String del cual se saca la información del I.D. del vendedor, que se utiliza como parámetro para hacer la consulta.
+     * @return un DTO global, con la lista de prodcutos pertenecientes al vendedor y un mensaje.
+     */
+    public HttpGlobalResponseDTO<List<ProductsResponseDTO>> getMyProducts(String token) {
+        HttpGlobalResponseDTO<List<ProductsResponseDTO>> response = new HttpGlobalResponseDTO<>();
+        List<ProductsResponseDTO> listDTO = new ArrayList<>();       
+
+        Long userId = jwtService.extractUserId(token);
+
+        List<Products> productsFound = productsRepository.findAllBySellerId(userId);
+
+        if (productsFound.isEmpty()) {
+            response.setMessage("Hubo un error en el desarrollo de la petición.");
+            return response;
+        }
+
+        for (Products products : productsFound) {
+            ProductsResponseDTO productsDTO = new ProductsResponseDTO();
+            productsDTO.setId(products.getId());
+            productsDTO.setName(products.getName());
+            productsDTO.setDescription(products.getDescription());
+            productsDTO.setPrice(products.getPrice());
+            productsDTO.setStock(products.getStock());
+            productsDTO.setCategoryId(products.getCategory().getId());
+            productsDTO.setCategoryName(products.getCategory().getName());
+            productsDTO.setSellerId(products.getSeller().getId());
+            productsDTO.setSellerName(products.getSeller().getUsername());
+            
+            listDTO.add(productsDTO);
+        }
+
+        response.setData(listDTO);
+        response.setMessage("Vendedor, estos son sus productos.");
+
         return response;
     }
 }
