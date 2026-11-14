@@ -14,6 +14,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 
@@ -39,5 +40,22 @@ public class ProductsController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
+
+    /**
+     * Método público para ver sólo la información de un producto.
+     * @param id es el I.D. registrado del producto que se quiere consultar.
+     * @return un "ResponseEntity" con un código Http y la información del producto más un mensaje.
+     */
+    @GetMapping("/{id}")
+    public ResponseEntity<HttpGlobalResponseDTO<ProductsResponseDTO>> getProduct(@PathVariable Long id) {
+        try {
+            HttpGlobalResponseDTO<ProductsResponseDTO> response = productsService.getProduct(id);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
+    
     
 }

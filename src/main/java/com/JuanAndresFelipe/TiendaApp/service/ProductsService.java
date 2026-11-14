@@ -85,4 +85,35 @@ public class ProductsService {
 
         return response;
     }
+    
+    /**
+     * Método para consultar la información de un producto.
+     * @param Id es el parámetro del I.D. registrado del producto.
+     * @return un DTO que expresa la información del producto consultado más un mensaje.
+     */
+    public HttpGlobalResponseDTO<ProductsResponseDTO> getProduct(Long Id) {
+        HttpGlobalResponseDTO<ProductsResponseDTO> response = new HttpGlobalResponseDTO<>();
+        ProductsResponseDTO productDTO = new ProductsResponseDTO();
+
+        Optional<Products> productFound = productsRepository.findById(Id);
+
+        if (productFound.isEmpty()) {
+            response.setMessage("No existe un producto registrado con ese I.D. en el sistema.");
+            return response;
+        }
+
+        productDTO.setId(productFound.get().getId());
+        productDTO.setName(productFound.get().getName());
+        productDTO.setDescription(productFound.get().getDescription());
+        productDTO.setPrice(productFound.get().getPrice());
+        productDTO.setStock(productFound.get().getStock());        
+        productDTO.setCategoryId(productFound.get().getCategory().getId());
+        productDTO.setCategoryName(productFound.get().getCategory().getName());
+        productDTO.setSellerId(productFound.get().getSeller().getId());
+        productDTO.setSellerName(productFound.get().getSeller().getUsername());
+
+        response.setData(productDTO);
+        response.setMessage("Producto obtenido al consultar el I.D. número: " + Id + ".");
+        return response;
+    }
 }
