@@ -7,13 +7,14 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import com.JuanAndresFelipe.TiendaApp.dto.HttpGlobalResponseDTO;
+import com.JuanAndresFelipe.TiendaApp.dto.ProductsRequestDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.ProductsResponseDTO;
-import com.JuanAndresFelipe.TiendaApp.dto.UserDTO;
 import com.JuanAndresFelipe.TiendaApp.entity.Categories;
 import com.JuanAndresFelipe.TiendaApp.entity.Products;
 import com.JuanAndresFelipe.TiendaApp.entity.Users;
 import com.JuanAndresFelipe.TiendaApp.repository.CategoriesRepository;
 import com.JuanAndresFelipe.TiendaApp.repository.ProductsRepository;
+import com.JuanAndresFelipe.TiendaApp.repository.UsersRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,6 +27,8 @@ public class ProductsService {
     private final CategoriesRepository categoriesRepository;
 
     private final JwtService jwtService;
+
+    private final UsersRepository usersRepository;
 
     /**
      * Método para traer una lista de los productos registrados en el sistema. También, estos pueden ser filtrados con el I.D. de la categoría de productos que se quieren ver.
@@ -96,8 +99,7 @@ public class ProductsService {
      * @return un DTO que expresa la información del producto consultado más un mensaje.
      */
     public HttpGlobalResponseDTO<ProductsResponseDTO> getProduct(Long Id) {
-        HttpGlobalResponseDTO<ProductsResponseDTO> response = new HttpGlobalResponseDTO<>();
-        ProductsResponseDTO productDTO = new ProductsResponseDTO();
+        HttpGlobalResponseDTO<ProductsResponseDTO> response = new HttpGlobalResponseDTO<>();        
 
         Optional<Products> productFound = productsRepository.findById(Id);
 
@@ -105,6 +107,8 @@ public class ProductsService {
             response.setMessage("No existe un producto registrado con ese I.D. en el sistema.");
             return response;
         }
+        
+        ProductsResponseDTO productDTO = new ProductsResponseDTO();
 
         productDTO.setId(productFound.get().getId());
         productDTO.setName(productFound.get().getName());
@@ -127,17 +131,18 @@ public class ProductsService {
      * @return un DTO global, con la lista de prodcutos pertenecientes al vendedor y un mensaje.
      */
     public HttpGlobalResponseDTO<List<ProductsResponseDTO>> getMyProducts(String token) {
-        HttpGlobalResponseDTO<List<ProductsResponseDTO>> response = new HttpGlobalResponseDTO<>();
-        List<ProductsResponseDTO> listDTO = new ArrayList<>();       
+        HttpGlobalResponseDTO<List<ProductsResponseDTO>> response = new HttpGlobalResponseDTO<>();               
 
-        Long userId = jwtService.extractUserId(token);
+        Long sellerId = jwtService.extractUserId(token);
 
-        List<Products> productsFound = productsRepository.findAllBySellerId(userId);
+        List<Products> productsFound = productsRepository.findAllBySellerId(sellerId);
 
         if (productsFound.isEmpty()) {
             response.setMessage("Hubo un error en el desarrollo de la petición.");
             return response;
         }
+
+        List<ProductsResponseDTO> listDTO = new ArrayList<>();
 
         for (Products products : productsFound) {
             ProductsResponseDTO productsDTO = new ProductsResponseDTO();
@@ -158,5 +163,62 @@ public class ProductsService {
         response.setMessage("Vendedor, estos son sus productos.");
 
         return response;
+    }
+
+    /**
+     * Método para registar un producto en el sistema.
+     * @param token es un String, del cual, se planea extraer la información del I.D. del vendedor, para ser utilizado en el proceso de la función.
+     * @param registry es un DTO por medio del cual, se obtiene la información del producto a registrar. 
+     * @return un DTO que aporta la información del producto registrado y mensaje acerca del estado de la petición.
+     */
+    public HttpGlobalResponseDTO<ProductsResponseDTO> registerProduct(String token, ProductsRequestDTO registry) {
+        HttpGlobalResponseDTO<ProductsResponseDTO> response = new HttpGlobalResponseDTO<>();
+        
+        Optional<Categories> categoryFound = categoriesRepository.findById(registry.getCategoryId());
+
+        if (categoryFound.isEmpty()) {
+            response.setMessage("El I.D. de categoría escrito para el producto no se encuentra registrada dentro del sistema.");
+            return response;
+        }
+
+        Long sellerId = jwtService.extractUserId(token);
+
+        Optional<Users> sellerFound = usersRepository.findById(sellerId);
+
+        Optional<Products> productFound = productsRepository.findByName(registry.getName());
+
+        if (productFound.isPresent()) {
+            
+            if (productFound.get().getName().equalsIgnoreCase(registry.getName()) && productFound.get().getSeller().getId() == sellerId) {
+                response.setMessage("Usuario, usted ya ha registrado ese producto anteriormente.");
+                return response;
+            }
+        }
+
+        ProductsResponseDTO productDTO = new ProductsResponseDTO();
+        Products product = new Products();
+
+        product.setName(registry.getName());
+        product.setDescription(registry.getDescription());
+        product.setPrice(registry.getPrice());
+        product.setStock(registry.getStock());
+        product.setCategory(categoryFound.get());
+        product.setSeller(sellerFound.get());
+
+        productsRepository.save(product);
+
+        productDTO.setId(product.getId());
+        productDTO.setName(product.getName());
+        productDTO.setDescription(product.getDescription());
+        productDTO.setPrice(product.getPrice());
+        productDTO.setStock(product.getStock());
+        productDTO.setCategoryId(product.getCategory().getId());
+        productDTO.setCategoryName(product.getCategory().getName());
+        productDTO.setSellerId(product.getSeller().getId());
+        productDTO.setSellerName(product.getSeller().getUsername());
+
+        response.setData(productDTO);
+        response.setMessage("El producto ha sido registrado con éxito.");
+        return response;        
     }
 }

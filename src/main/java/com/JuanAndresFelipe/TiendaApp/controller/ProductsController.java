@@ -3,8 +3,8 @@ package com.JuanAndresFelipe.TiendaApp.controller;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.JuanAndresFelipe.TiendaApp.dto.HttpGlobalResponseDTO;
+import com.JuanAndresFelipe.TiendaApp.dto.ProductsRequestDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.ProductsResponseDTO;
-import com.JuanAndresFelipe.TiendaApp.dto.UserDTO;
 import com.JuanAndresFelipe.TiendaApp.enums.RoleEnum;
 import com.JuanAndresFelipe.TiendaApp.security.RequiresRole;
 import com.JuanAndresFelipe.TiendaApp.service.ProductsService;
@@ -19,6 +19,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 
@@ -83,6 +85,41 @@ public class ProductsController {
         try {
             response = productsService.getMyProducts(token);
             return ResponseEntity.status(HttpStatus.OK).body(response);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
+
+    /**
+     * Método para que un vendedor pueda hacer registro de sus productos en el sistema.
+     * @param request es la petición que se utiliza para poder extraer el I.D. del vendedor y que el sistema le permita hacer el registro.
+     * @param registry es el DTO de los productos para poder ingresar su información al sistema.
+     * @return un "ResponseEntity" con un código Http, un mensaje y un DTO que muestra la información del producto registrado.
+     */
+    @PostMapping()
+    @RequiresRole(RoleEnum.VENDEDOR)
+    public ResponseEntity<HttpGlobalResponseDTO<ProductsResponseDTO>> registryProduct(HttpServletRequest request, @RequestBody ProductsRequestDTO registry) {
+        HttpGlobalResponseDTO<ProductsResponseDTO> response = new HttpGlobalResponseDTO<>();
+        
+        String authHeader = request.getHeader("Authorization");
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            response.setMessage("Token invalido.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+
+        String token = authHeader.replace("Bearer ", "");
+        
+        try {
+            response = productsService.registerProduct(token, registry);
+            
+            if (response.getData() == null) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+            } else {
+                return ResponseEntity.status(HttpStatus.CREATED).body(response);
+            }
             
         } catch (Exception e) {
             e.printStackTrace();

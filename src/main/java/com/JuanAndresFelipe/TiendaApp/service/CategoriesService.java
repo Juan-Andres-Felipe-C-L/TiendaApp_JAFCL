@@ -54,8 +54,7 @@ public class CategoriesService {
      * @return un DTO global con la información de la nueva categoría registrada y un mensaje.
      */
     public HttpGlobalResponseDTO<CategoriesResponseDTO> registerCategory(CategoriesRequestDTO request) {
-        HttpGlobalResponseDTO<CategoriesResponseDTO> response = new HttpGlobalResponseDTO<>();
-        CategoriesResponseDTO categoryDTO = new CategoriesResponseDTO();
+        HttpGlobalResponseDTO<CategoriesResponseDTO> response = new HttpGlobalResponseDTO<>();       
 
         Optional<Categories> categoryFound = categoriesRepository.findByName(request.getName());
 
@@ -63,6 +62,8 @@ public class CategoriesService {
             response.setMessage("Ya hay una categoría de productos registrada con ese nombre.");
             return response;
         }
+
+        CategoriesResponseDTO categoryDTO = new CategoriesResponseDTO();
 
         Categories category = new Categories();
         category.setName(request.getName());
@@ -84,8 +85,7 @@ public class CategoriesService {
      * @return un DTO que brinda la información de la categoría y un mensaje para confirmar se ella fue borrada con éxito.
      */
     public HttpGlobalResponseDTO<CategoriesResponseDTO> deleteCategory(Long id) {
-        HttpGlobalResponseDTO<CategoriesResponseDTO> response = new HttpGlobalResponseDTO<>();
-        CategoriesResponseDTO categoryDTO = new CategoriesResponseDTO();
+        HttpGlobalResponseDTO<CategoriesResponseDTO> response = new HttpGlobalResponseDTO<>();        
 
         Optional<Categories> categoryFound = categoriesRepository.findById(id);
 
@@ -101,6 +101,8 @@ public class CategoriesService {
             return response;
         }
 
+        CategoriesResponseDTO categoryDTO = new CategoriesResponseDTO();
+        
         categoryDTO.setId(categoryFound.get().getId());
         categoryDTO.setName(categoryFound.get().getName());
         response.setData(categoryDTO);

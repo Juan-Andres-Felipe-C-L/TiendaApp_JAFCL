@@ -37,8 +37,7 @@ public class UsersService {
      * @return un DTO que tiene un mensaje y la información del perfil del usuario.
      */    
     public HttpGlobalResponseDTO<UserDTO> getMyProfile(String token) {
-        HttpGlobalResponseDTO<UserDTO> response = new HttpGlobalResponseDTO<>();
-        UserDTO userDTO = new UserDTO();        
+        HttpGlobalResponseDTO<UserDTO> response = new HttpGlobalResponseDTO<>();                
 
         Long userId = jwtService.extractUserId(token);
 
@@ -48,6 +47,8 @@ public class UsersService {
             response.setMessage("Hubo un error en el desarrollo de la petición.");
             return response;
         }
+
+        UserDTO userDTO = new UserDTO();
 
         userDTO.setId(userFound.get().getId());
         userDTO.setUsername(userFound.get().getUsername());
@@ -95,8 +96,7 @@ public class UsersService {
      * @return un DTO con un mensaje y algunos datos del usuario registrado.
      */
     public HttpGlobalResponseDTO<UserDTO> register(RegisterRequestDTO request) {
-        HttpGlobalResponseDTO<UserDTO> response = new HttpGlobalResponseDTO<>();
-        UserDTO userDTO = new UserDTO();
+        HttpGlobalResponseDTO<UserDTO> response = new HttpGlobalResponseDTO<>();        
 
         Optional<Users> usernameFound = usersRepository.findByUsername(request.getUsername());
         Optional<Users> emailFound = usersRepository.findByEmail(request.getEmail());
@@ -116,6 +116,8 @@ public class UsersService {
             response.setMessage("El rol no existe.");
             return response;
         }
+
+        UserDTO userDTO = new UserDTO();
 
         Users user = new Users();
         user.setUsername(request.getUsername());
@@ -144,8 +146,7 @@ public class UsersService {
      * @return Se retorna un DTO con un mensaje y algunos datos del usuario a quien se le está haciendo la actualización.
      */
     public HttpGlobalResponseDTO<UserDTO> changeRoleId(Long id, ChangeRoleDTO request ) {
-        HttpGlobalResponseDTO<UserDTO> response = new HttpGlobalResponseDTO<>();
-        UserDTO userDTO = new UserDTO();
+        HttpGlobalResponseDTO<UserDTO> response = new HttpGlobalResponseDTO<>();        
 
         Optional<Users> userFound = usersRepository.findById(id);
         Optional<Roles> roleFound = rolesRepository.findById(request.getNewRoleId());
@@ -164,6 +165,8 @@ public class UsersService {
             response.setMessage("El rol que quiere cambiar a este usuario es el mismo que éste ya tiene.");
             return response;
         }
+
+        UserDTO userDTO = new UserDTO();
 
         Users user = userFound.get();
         user.setRole(roleFound.get());
@@ -189,8 +192,7 @@ public class UsersService {
      * @return un DTO que trae un mensaje y algunos de los datos del usuario a quien se le hizo el cambio. Aquí se confirma si el cambio fue realizado con éxito.
      */
     public HttpGlobalResponseDTO<UserDTO> changeStatus(Long id, ChangeStatusDTO request ) {
-        HttpGlobalResponseDTO<UserDTO> response = new HttpGlobalResponseDTO<>();
-        UserDTO userDTO = new UserDTO();
+        HttpGlobalResponseDTO<UserDTO> response = new HttpGlobalResponseDTO<>();        
 
         Optional<Users> userFound = usersRepository.findById(id);
 
@@ -203,6 +205,8 @@ public class UsersService {
             response.setMessage("El usuario que quiere cambiar ya tiene ese status.");
             return response;
         }
+
+        UserDTO userDTO = new UserDTO();
 
         Users user = userFound.get();
         user.setActive(request.isNewStatus());

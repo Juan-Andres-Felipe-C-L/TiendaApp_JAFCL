@@ -39,7 +39,6 @@ public class AuthService {
      */
     public HttpGlobalResponseDTO<UserDTO> register(ClientRegisterRequestDTO request) {
         HttpGlobalResponseDTO<UserDTO> response = new HttpGlobalResponseDTO<>();
-        UserDTO userDTO = new UserDTO();
 
         Optional<Users> usernameFound = usersRepository.findByUsername(request.getUsername());
         Optional<Users> emailFound = usersRepository.findByEmail(request.getEmail());
@@ -54,6 +53,8 @@ public class AuthService {
             response.setMessage("El correo de usuario ya está en uso.");
             return response;
         }
+
+        UserDTO userDTO = new UserDTO();
 
         Users user = new Users();
         user.setUsername(request.getUsername());

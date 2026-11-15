@@ -13,7 +13,5 @@ public class ProductsRequestDTO {
 
     private int stock;
 
-    private int categoryId;
-
-    private int sellerId;
+    private Long categoryId;
 }
