@@ -153,8 +153,9 @@ public class ProductsController {
         
         try {
             response = productsService.editProduct(id, registry, token);
-            
-            if (response.getData() == null) {
+            if (response.getMessage().equals("El I.D. escrito no lo tiene ningún producto en el sistema.") || response.getMessage().equals("El I.D. de categoría escrito no existe en el sistema.")) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+            } else if (response.getData() == null) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
             } else {
                 return ResponseEntity.status(HttpStatus.CREATED).body(response);
