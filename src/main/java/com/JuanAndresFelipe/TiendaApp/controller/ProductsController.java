@@ -2,6 +2,7 @@ package com.JuanAndresFelipe.TiendaApp.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
+import com.JuanAndresFelipe.TiendaApp.dto.CategoriesResponseDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.HttpGlobalResponseDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.ProductsRequestDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.ProductsResponseDTO;
@@ -22,6 +23,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PutMapping;
+
 
 
 @RestController
@@ -117,6 +120,42 @@ public class ProductsController {
             
             if (response.getData() == null) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+            } else {
+                return ResponseEntity.status(HttpStatus.CREATED).body(response);
+            }
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
+
+    /**
+     * Método para que los administradores y vendedores puedan actulizar la información de un producto. Los vendedores solo pueden actulizar sus propios productos. Nadie puede cambiar los vendedores de cada producto.
+     * @param id es el I.D. del producto que se quiere actualizar.
+     * @param registry es el DTO que se utiliza para actualizar los datos del producto.
+     * @param request es la petición que se utiliza para obtener el token JWT.
+     * @return un "ResponseEntity" con un mensaje y un código Http acerca del resultado de la petición. Éste también trae la informacioón del producto actulizado.
+     */
+    @PutMapping("/{id}")
+    @RequiresRole({RoleEnum.ADMIN, RoleEnum.VENDEDOR})
+    public ResponseEntity<HttpGlobalResponseDTO<ProductsResponseDTO>> editProduct(@PathVariable Long id, @RequestBody ProductsRequestDTO registry, HttpServletRequest request) {
+        HttpGlobalResponseDTO<ProductsResponseDTO> response = new HttpGlobalResponseDTO<>();
+        
+        String authHeader = request.getHeader("Authorization");
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            response.setMessage("Token invalido.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+
+        String token = authHeader.replace("Bearer ", "");
+        
+        try {
+            response = productsService.editProduct(id, registry, token);
+            
+            if (response.getData() == null) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
             } else {
                 return ResponseEntity.status(HttpStatus.CREATED).body(response);
             }
