@@ -5,8 +5,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import com.JuanAndresFelipe.TiendaApp.dto.HttpGlobalResponseDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.ProductsRequestDTO;
@@ -17,8 +15,6 @@ import com.JuanAndresFelipe.TiendaApp.entity.Users;
 import com.JuanAndresFelipe.TiendaApp.repository.CategoriesRepository;
 import com.JuanAndresFelipe.TiendaApp.repository.ProductsRepository;
 import com.JuanAndresFelipe.TiendaApp.repository.UsersRepository;
-
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -300,8 +296,10 @@ public class ProductsService {
 
                 response.setData(productDTO);
                 response.setMessage("El producto ha sido actualizado con éxito.");
+            
             } else {
-                response.setMessage("Usuario, esta acción está prohibida para usted.");
+                
+                response.setMessage("Usuario, usted no puede actualizar productos que no sean suyos.");
                 return response;
             }
 
@@ -327,6 +325,74 @@ public class ProductsService {
 
             response.setData(productDTO);
             response.setMessage("El producto ha sido actualizado con éxito.");
+        }
+
+        return response;
+    }
+
+
+
+
+
+    public HttpGlobalResponseDTO<ProductsResponseDTO> deleteProduct(Long id, String token) {
+        HttpGlobalResponseDTO<ProductsResponseDTO> response = new HttpGlobalResponseDTO<>();
+
+        Optional<Products> productFound = productsRepository.findById(id);
+
+        if (productFound.isEmpty()) {
+            response.setMessage("El I.D. escrito no lo tiene ningún producto en el sistema.");
+            return response;
+        }
+
+        Long sellerId = jwtService.extractUserId(token);
+
+        Optional<Users> userFound = usersRepository.findById(sellerId);
+
+        ProductsResponseDTO productDTO = new ProductsResponseDTO();
+
+        if (userFound.get().getRole().getId() == 3) {
+
+            if (productFound.get().getSeller().getId() == userFound.get().getId()) {
+                
+                productDTO.setId(productFound.get().getId());
+                productDTO.setName(productFound.get().getName());
+                productDTO.setDescription(productFound.get().getDescription());
+                productDTO.setPrice(productFound.get().getPrice());
+                productDTO.setStock(productFound.get().getStock());
+                productDTO.setCategoryId(productFound.get().getCategory().getId());
+                productDTO.setCategoryName(productFound.get().getCategory().getName());
+                productDTO.setSellerId(productFound.get().getSeller().getId());
+                productDTO.setSellerName(productFound.get().getSeller().getUsername());
+
+                response.setData(productDTO);
+
+                productsRepository.deleteById(productFound.get().getId());                
+
+                response.setMessage("El producto ha sido eliminado con éxito.");
+           
+            } else {
+                
+                response.setMessage("Usuario, usted no puede eliminar productos que no sean suyos.");
+                return response;
+            }
+
+        } else if (userFound.get().getRole().getId() == 1) {
+
+            productDTO.setId(productFound.get().getId());
+            productDTO.setName(productFound.get().getName());
+            productDTO.setDescription(productFound.get().getDescription());
+            productDTO.setPrice(productFound.get().getPrice());
+            productDTO.setStock(productFound.get().getStock());
+            productDTO.setCategoryId(productFound.get().getCategory().getId());
+            productDTO.setCategoryName(productFound.get().getCategory().getName());
+            productDTO.setSellerId(productFound.get().getSeller().getId());
+            productDTO.setSellerName(productFound.get().getSeller().getUsername());
+
+            response.setData(productDTO);
+            
+            productsRepository.deleteById(productFound.get().getId());
+
+            response.setMessage("El producto ha sido eliminado con éxito.");
         }
 
         return response;

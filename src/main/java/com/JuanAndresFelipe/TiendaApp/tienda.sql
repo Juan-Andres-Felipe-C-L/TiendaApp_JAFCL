@@ -1,5 +1,5 @@
-CREATE DATABASE tienda_db;
-USE tienda_db;
+CREATE DATABASE tienda;
+USE tienda;
  
 CREATE TABLE roles(
   id int primary key not null auto_increment,
@@ -43,14 +43,6 @@ CREATE TABLE orders(
   created_at datetime not null default current_timestamp,
   foreign key (client_id) references users (id),
   foreign key (product_id) references products (id)
-);
-
-CREATE TABLE order_products (
-    order_id INT NOT NULL,
-    product_id INT NOT NULL,
-    PRIMARY KEY (order_id, product_id),
-    FOREIGN KEY (order_id) REFERENCES orders(id),
-    FOREIGN KEY (product_id) REFERENCES products(id)
 );
 
 -- Se pone sentencia para poder actualizar la información de las tablas, apesar de usar relaciones de Foreign Keys: 

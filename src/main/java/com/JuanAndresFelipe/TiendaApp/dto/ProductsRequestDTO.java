@@ -1,5 +1,7 @@
 package com.JuanAndresFelipe.TiendaApp.dto;
 
+import java.math.BigDecimal;
+
 import lombok.Data;
 
 @Data 
@@ -9,7 +11,7 @@ public class ProductsRequestDTO {
 
     private String description;
 
-    private double price;
+    private BigDecimal price;
 
     private int stock;
 

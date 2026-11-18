@@ -2,7 +2,6 @@ package com.JuanAndresFelipe.TiendaApp.entity;
 
 import java.util.List;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -15,11 +14,12 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
 
+
 @Entity
 @Data
 @Table(name = "users")
 public class Users {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -27,18 +27,18 @@ public class Users {
 
     @Column(name = "username")
     private String username;
-    
+
     @Column(name = "email")
     private String email;
 
     @Column(name = "password")
     private String password;
 
-    @Column (name = "active")
+    @Column(name = "active")
     private boolean active = true;
 
-    @ManyToOne (cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "rol_id", referencedColumnName = "id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "rol_id")
     private Roles role;
 
     @OneToMany(mappedBy = "seller")

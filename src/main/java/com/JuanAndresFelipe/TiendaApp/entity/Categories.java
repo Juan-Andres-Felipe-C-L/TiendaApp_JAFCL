@@ -11,11 +11,12 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
 
+
 @Entity
 @Data
 @Table(name = "categories")
 public class Categories {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -27,3 +28,4 @@ public class Categories {
     @OneToMany(mappedBy = "category")
     private List<Products> products;
 }
+

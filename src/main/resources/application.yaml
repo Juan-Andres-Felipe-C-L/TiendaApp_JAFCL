@@ -3,7 +3,7 @@ spring:
     name: TiendaApp
 
   datasource:
-    url: jdbc:mysql://localhost:3306/tienda_db
+    url: jdbc:mysql://localhost:3306/tienda
     username: root
     password: "0000"
     driver-class-name: com.mysql.cj.jdbc.Driver

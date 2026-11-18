@@ -2,7 +2,6 @@ package com.JuanAndresFelipe.TiendaApp.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import com.JuanAndresFelipe.TiendaApp.dto.CategoriesResponseDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.HttpGlobalResponseDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.ProductsRequestDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.ProductsResponseDTO;
@@ -18,6 +17,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -154,6 +154,42 @@ public class ProductsController {
         try {
             response = productsService.editProduct(id, registry, token);
             if (response.getMessage().equals("El I.D. escrito no lo tiene ningún producto en el sistema.") || response.getMessage().equals("El I.D. de categoría escrito no existe en el sistema.")) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+            } else if (response.getData() == null) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+            } else {
+                return ResponseEntity.status(HttpStatus.CREATED).body(response);
+            }
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
+
+    /**
+     * Método para que los administradores puedan borrar productos y los vendedores también lo puedan hacer con los suyos.
+     * @param id es el I.D. del producto que se quiere utilizar para borrarlo.
+     * @param request es la petición para poder obtener el token JWT y obtener el I.D. del usuario que está haciendo la petición.
+     * @return un "ResponseEntity" que contiene un código Http, un mensaje y la información del producto que está siendo borrado del sistema.
+     */
+    @DeleteMapping("/{id}")
+    @RequiresRole({RoleEnum.ADMIN, RoleEnum.VENDEDOR})
+    public ResponseEntity<HttpGlobalResponseDTO<ProductsResponseDTO>> deleteProduct(@PathVariable Long id, HttpServletRequest request) {
+        HttpGlobalResponseDTO<ProductsResponseDTO> response = new HttpGlobalResponseDTO<>();
+        
+        String authHeader = request.getHeader("Authorization");
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            response.setMessage("Token invalido.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+
+        String token = authHeader.replace("Bearer ", "");
+        
+        try {
+            response = productsService.deleteProduct(id, token);
+            if (response.getMessage().equals("El I.D. escrito no lo tiene ningún producto en el sistema.")) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
             } else if (response.getData() == null) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
