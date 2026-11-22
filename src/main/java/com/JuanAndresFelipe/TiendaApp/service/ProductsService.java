@@ -150,7 +150,7 @@ public class ProductsService {
         List<Products> productsFound = productsRepository.findAllBySellerId(sellerId);
 
         if (productsFound.isEmpty()) {
-            response.setMessage("Hubo un error en el desarrollo de la petición.");
+            response.setMessage("Usuario, usted no ha publicado ningún producto en esta aplicacicón.");
             return response;
         }
 

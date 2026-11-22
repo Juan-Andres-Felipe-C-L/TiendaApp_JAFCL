@@ -14,8 +14,11 @@ import com.JuanAndresFelipe.TiendaApp.service.OrdersService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -56,6 +59,35 @@ public class OrdersController {
             } else {
                 return ResponseEntity.status(HttpStatus.CREATED).body(response);
             }
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
+
+    /**
+     * Método para que un cliente pueda ver la información de todos sus pedidos.
+     * @param request es la petición que se utiliza para extraer el JWT token.
+     * @return un "ResponseEntity" con un código Http, una lista de todos los pedidos del cliente y un mensaje.
+     */
+    @GetMapping("/mine")
+    @RequiresRole(RoleEnum.CLIENTE)
+    public ResponseEntity<HttpGlobalResponseDTO<List<OrdersResponseDTO>>> getMyOrders(HttpServletRequest request) {
+        HttpGlobalResponseDTO<List<OrdersResponseDTO>> response = new HttpGlobalResponseDTO<>();
+        
+        String authHeader = request.getHeader("Authorization");
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            response.setMessage("Token invalido.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+
+        String token = authHeader.replace("Bearer ", "");
+        
+        try {
+            response = ordersService.getMyOrders(token);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
             
         } catch (Exception e) {
             e.printStackTrace();

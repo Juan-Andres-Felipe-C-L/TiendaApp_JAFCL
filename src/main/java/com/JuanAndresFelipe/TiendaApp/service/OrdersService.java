@@ -1,6 +1,8 @@
 package com.JuanAndresFelipe.TiendaApp.service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -8,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.JuanAndresFelipe.TiendaApp.dto.HttpGlobalResponseDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.OrdersRequestDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.OrdersResponseDTO;
+import com.JuanAndresFelipe.TiendaApp.dto.ProductsResponseDTO;
 import com.JuanAndresFelipe.TiendaApp.entity.Orders;
 import com.JuanAndresFelipe.TiendaApp.entity.Products;
 import com.JuanAndresFelipe.TiendaApp.entity.Users;
@@ -98,5 +101,45 @@ public class OrdersService {
         response.setData(orderDTO);
         response.setMessage("Pedido registrado exitosamente.");
         return response;        
+    }
+
+    /**
+     * Método que permite ver todos los pedidos de un usuario tipo cliente.
+     * @param token es de donde se extrae la información del usuario que está realizando la petición.
+     * @return un DTO general que trae un mensaje y una lista de todos los pedidos del usuario.
+     */
+    public HttpGlobalResponseDTO<List<OrdersResponseDTO>> getMyOrders(String token) {
+        HttpGlobalResponseDTO<List<OrdersResponseDTO>> response = new HttpGlobalResponseDTO<>();
+
+        Long clientId = jwtService.extractUserId(token);
+
+        List<Orders> ordersFound = ordersRepository.findAllByClientId(clientId);
+
+        if (ordersFound.isEmpty()) {
+            response.setMessage("Usuario, usted no ha realizado ningún pedido en esta aplicación.");
+            return response;
+        }
+
+        List<OrdersResponseDTO> listDTO = new ArrayList<>();
+
+        for (Orders order : ordersFound) {
+            OrdersResponseDTO ordersDTO = new OrdersResponseDTO();
+            ordersDTO.setId(order.getId());
+            ordersDTO.setClientId(order.getClient().getId());
+            ordersDTO.setUsername(order.getClient().getUsername());
+            ordersDTO.setProductId(order.getProduct().getId());
+            ordersDTO.setProductName(order.getProduct().getName());
+            ordersDTO.setQuantity(order.getQuantity());
+            ordersDTO.setTotal(order.getTotal());
+            ordersDTO.setStatus(order.getStatus());
+            ordersDTO.setCreatedAt(order.getCreatedAt());
+
+            listDTO.add(ordersDTO);
+        }
+
+        response.setData(listDTO);
+        response.setMessage("Cliente, estos son sus pedidos.");
+
+        return response;
     }
 }
