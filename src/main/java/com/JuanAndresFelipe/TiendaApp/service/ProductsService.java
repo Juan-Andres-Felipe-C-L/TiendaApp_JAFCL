@@ -1,5 +1,6 @@
 package com.JuanAndresFelipe.TiendaApp.service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -190,6 +191,18 @@ public class ProductsService {
     public HttpGlobalResponseDTO<ProductsResponseDTO> registerProduct(String token, ProductsRequestDTO registry) {
         HttpGlobalResponseDTO<ProductsResponseDTO> response = new HttpGlobalResponseDTO<>();
 
+        if (registry.getPrice().compareTo(BigDecimal.ZERO) <= 0) {
+            response.setMessage(
+                    "Usuario, no se le puede poner un precio menor o igual que 0 a un producto.");
+            return response;
+        }
+
+        if (registry.getStock() <= 0) {
+            response.setMessage(
+                    "Usuario, no se le puede poner un stock menor o igual que 0 a un producto.");
+            return response;
+        }
+
         Optional<Categories> categoryFound = categoriesRepository.findById(registry.getCategoryId());
 
         if (categoryFound.isEmpty()) {
@@ -250,6 +263,18 @@ public class ProductsService {
     public HttpGlobalResponseDTO<ProductsResponseDTO> editProduct(Long id, ProductsRequestDTO registry, String token) {
         HttpGlobalResponseDTO<ProductsResponseDTO> response = new HttpGlobalResponseDTO<>();
 
+        if (registry.getPrice().compareTo(BigDecimal.ZERO) <= 0) {
+            response.setMessage(
+                    "Usuario, no se le puede poner un precio menor o igual que 0 a un producto.");
+            return response;
+        }
+
+        if (registry.getStock() <= 0) {
+            response.setMessage(
+                    "Usuario, no se le puede poner un stock menor o igual que 0 a un producto.");
+            return response;
+        }
+        
         Optional<Products> productFound = productsRepository.findById(id);
 
         if (productFound.isEmpty()) {

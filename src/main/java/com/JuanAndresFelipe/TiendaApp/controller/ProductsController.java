@@ -103,7 +103,7 @@ public class ProductsController {
      */
     @PostMapping()
     @RequiresRole(RoleEnum.VENDEDOR)
-    public ResponseEntity<HttpGlobalResponseDTO<ProductsResponseDTO>> registryProduct(HttpServletRequest request, @RequestBody ProductsRequestDTO registry) {
+    public ResponseEntity<HttpGlobalResponseDTO<ProductsResponseDTO>> registerProduct(HttpServletRequest request, @RequestBody ProductsRequestDTO registry) {
         HttpGlobalResponseDTO<ProductsResponseDTO> response = new HttpGlobalResponseDTO<>();
         
         String authHeader = request.getHeader("Authorization");
@@ -153,7 +153,7 @@ public class ProductsController {
         
         try {
             response = productsService.editProduct(id, registry, token);
-            if (response.getMessage().equals("El I.D. escrito no lo tiene ningún producto en el sistema.") || response.getMessage().equals("El I.D. de categoría escrito no existe en el sistema.")) {
+            if (response.getMessage().equals("El I.D. escrito no lo tiene ningún producto en el sistema.") || response.getMessage().equals("El I.D. de categoría escrito no existe en el sistema.") || response.getMessage().equals("Usuario, no se le puede poner un precio menor o igual que 0 a un producto.") || response.getMessage().equals("Usuario, no se le puede poner un stock menor o igual que 0 a un producto.")) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
             } else if (response.getData() == null) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
