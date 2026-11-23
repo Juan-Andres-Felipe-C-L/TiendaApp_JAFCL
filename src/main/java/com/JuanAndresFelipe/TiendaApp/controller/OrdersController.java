@@ -93,10 +93,14 @@ public class OrdersController {
         }
     }
 
-    /**///////////////VENDEDORES Obtener pedidos de sus productos. */
+    /**
+     * Método para que los usuarios, del tipo vendedor, puedan consultar los pedidos que incluyen sus productos.
+     * @param request se utiliza para extraer el JWT token y obtener la información del usuario que está realizando la consulta.
+     * @return un "ResponseEntity" que trae un código Http, la información de los pedidos y un mensaje.
+     */
     @GetMapping("/sales")
-    @RequiresRole(RoleEnum.CLIENTE)
-    public ResponseEntity<HttpGlobalResponseDTO<List<OrdersResponseDTO>>> getMyOrders(HttpServletRequest request) {
+    @RequiresRole(RoleEnum.VENDEDOR)
+    public ResponseEntity<HttpGlobalResponseDTO<List<OrdersResponseDTO>>> getMySales(HttpServletRequest request) {
         HttpGlobalResponseDTO<List<OrdersResponseDTO>> response = new HttpGlobalResponseDTO<>();
         
         String authHeader = request.getHeader("Authorization");
@@ -109,7 +113,7 @@ public class OrdersController {
         String token = authHeader.replace("Bearer ", "");
         
         try {
-            response = ordersService.getMyOrders(token);
+            response = ordersService.getMySales(token);
             return ResponseEntity.status(HttpStatus.OK).body(response);            
         } catch (Exception e) {
             e.printStackTrace();

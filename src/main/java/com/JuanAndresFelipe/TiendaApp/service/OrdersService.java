@@ -142,15 +142,45 @@ public class OrdersService {
         return response;
     }
 
+    /**
+     * Función que permite conocer los pedidos que incluyen los productos especificos de un vendedor.
+     * @param token  JWT, del cual, se extrae la información del vendedor que está realizando la consulta.
+     * @return un DTO general que mustra la información de los pedidos y un mensaje.
+     */
+    public HttpGlobalResponseDTO<List<OrdersResponseDTO>> getMySales(String token) {
+        HttpGlobalResponseDTO<List<OrdersResponseDTO>> response = new HttpGlobalResponseDTO<>();
 
+        Long sellerId = jwtService.extractUserId(token);
 
+        List<Orders> ordersFound = ordersRepository.findAllByProductSellerId(sellerId);
 
+        if (ordersFound.isEmpty()) {
+            response.setMessage("Vendedor, aún no hay pedidos registrados que incluyan los productos que usted vende.");
+            return response;
+        }
 
-    /**///////////////VENDEDORES Obtener pedidos de sus productos. */
+        List<OrdersResponseDTO> listDTO = new ArrayList<>();
 
+        for (Orders order : ordersFound) {
+            OrdersResponseDTO ordersDTO = new OrdersResponseDTO();
+            ordersDTO.setId(order.getId());
+            ordersDTO.setClientId(order.getClient().getId());
+            ordersDTO.setUsername(order.getClient().getUsername());
+            ordersDTO.setProductId(order.getProduct().getId());
+            ordersDTO.setProductName(order.getProduct().getName());
+            ordersDTO.setQuantity(order.getQuantity());
+            ordersDTO.setTotal(order.getTotal());
+            ordersDTO.setStatus(order.getStatus());
+            ordersDTO.setCreatedAt(order.getCreatedAt());
 
+            listDTO.add(ordersDTO);
+        }
 
-    
+        response.setData(listDTO);
+        response.setMessage("Vendedor, estos son los pedidos que incluyen sus productos.");
+
+        return response;
+    }    
     
     /**
      * Método para ver los pedidos realizados en la aplicación.
