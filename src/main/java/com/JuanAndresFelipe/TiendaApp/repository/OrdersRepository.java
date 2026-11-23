@@ -10,4 +10,6 @@ import com.JuanAndresFelipe.TiendaApp.entity.Orders;
 public interface OrdersRepository extends JpaRepository<Orders, Long>{
     
     List<Orders> findAllByClientId(Long clientId);
+
+    List<Orders> findAllByProductSellerId(Long sellerId);
 }
