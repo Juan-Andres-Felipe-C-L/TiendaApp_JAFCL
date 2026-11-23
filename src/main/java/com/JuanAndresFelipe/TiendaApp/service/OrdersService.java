@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import com.JuanAndresFelipe.TiendaApp.dto.HttpGlobalResponseDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.OrdersRequestDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.OrdersResponseDTO;
-import com.JuanAndresFelipe.TiendaApp.dto.ProductsResponseDTO;
 import com.JuanAndresFelipe.TiendaApp.entity.Orders;
 import com.JuanAndresFelipe.TiendaApp.entity.Products;
 import com.JuanAndresFelipe.TiendaApp.entity.Users;
@@ -139,6 +138,53 @@ public class OrdersService {
 
         response.setData(listDTO);
         response.setMessage("Cliente, estos son sus pedidos.");
+
+        return response;
+    }
+
+
+
+
+
+    /**///////////////VENDEDORES Obtener pedidos de sus productos. */
+
+
+
+    
+    
+    /**
+     * Método para ver los pedidos realizados en la aplicación.
+     * @return un DTO que trae toda la información de los pedidos de la aplicación y un mensaje.
+     */
+    public HttpGlobalResponseDTO<List<OrdersResponseDTO>> getOrders() {
+        HttpGlobalResponseDTO<List<OrdersResponseDTO>> response = new HttpGlobalResponseDTO<>();
+        
+        List<Orders> ordersFound = ordersRepository.findAll();
+
+        if (ordersFound.isEmpty()) {
+            response.setMessage("Administrador, aún no hay pedidos registrados en el sistema.");
+            return response;
+        }
+
+        List<OrdersResponseDTO> listOrders = new ArrayList<>();
+
+        for (Orders order : ordersFound) {
+            OrdersResponseDTO orderDTO = new OrdersResponseDTO();
+            orderDTO.setId(order.getId());
+            orderDTO.setClientId(order.getClient().getId());
+            orderDTO.setUsername(order.getClient().getUsername());
+            orderDTO.setProductId(order.getProduct().getId());
+            orderDTO.setProductName(order.getProduct().getName());
+            orderDTO.setQuantity(order.getQuantity());
+            orderDTO.setTotal(order.getTotal());
+            orderDTO.setStatus(order.getStatus());
+            orderDTO.setCreatedAt(order.getCreatedAt());
+
+            listOrders.add(orderDTO);
+        }
+
+        response.setMessage("Estos son los pedidos encontrados.");
+        response.setData(listOrders);
 
         return response;
     }

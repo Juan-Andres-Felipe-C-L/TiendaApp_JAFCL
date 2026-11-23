@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.JuanAndresFelipe.TiendaApp.dto.HttpGlobalResponseDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.OrdersRequestDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.OrdersResponseDTO;
-import com.JuanAndresFelipe.TiendaApp.dto.ProductsResponseDTO;
 import com.JuanAndresFelipe.TiendaApp.enums.RoleEnum;
 import com.JuanAndresFelipe.TiendaApp.security.RequiresRole;
 import com.JuanAndresFelipe.TiendaApp.service.OrdersService;
@@ -87,8 +86,30 @@ public class OrdersController {
         
         try {
             response = ordersService.getMyOrders(token);
-            return ResponseEntity.status(HttpStatus.OK).body(response);
-            
+            return ResponseEntity.status(HttpStatus.OK).body(response);            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
+
+
+
+
+    /**///////////////VENDEDORES Obtener pedidos de sus productos. */
+
+
+
+    /**
+     * Método para que los usuarios, del tipo administrador, puedan ver todos los pedidos que se han hecho en la aplicación.
+     * @return un "ResponseEntity" con un DTO que trae toda la infromación de los pedidos, un código Http y un mensaje.
+     */
+    @GetMapping()
+    @RequiresRole(RoleEnum.ADMIN)
+    public ResponseEntity<HttpGlobalResponseDTO<List<OrdersResponseDTO>>> getOrders() {        
+        try {
+            HttpGlobalResponseDTO<List<OrdersResponseDTO>> response = ordersService.getOrders();
+            return ResponseEntity.status(HttpStatus.OK).body(response);            
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
