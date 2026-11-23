@@ -93,12 +93,29 @@ public class OrdersController {
         }
     }
 
-
-
-
     /**///////////////VENDEDORES Obtener pedidos de sus productos. */
+    @GetMapping("/sales")
+    @RequiresRole(RoleEnum.CLIENTE)
+    public ResponseEntity<HttpGlobalResponseDTO<List<OrdersResponseDTO>>> getMyOrders(HttpServletRequest request) {
+        HttpGlobalResponseDTO<List<OrdersResponseDTO>> response = new HttpGlobalResponseDTO<>();
+        
+        String authHeader = request.getHeader("Authorization");
 
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            response.setMessage("Token invalido.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
 
+        String token = authHeader.replace("Bearer ", "");
+        
+        try {
+            response = ordersService.getMyOrders(token);
+            return ResponseEntity.status(HttpStatus.OK).body(response);            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
 
     /**
      * Método para que los usuarios, del tipo administrador, puedan ver todos los pedidos que se han hecho en la aplicación.
