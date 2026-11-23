@@ -7,12 +7,17 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.JuanAndresFelipe.TiendaApp.dto.ChangeOrdersStatusDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.HttpGlobalResponseDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.OrdersRequestDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.OrdersResponseDTO;
+import com.JuanAndresFelipe.TiendaApp.dto.ProductsRequestDTO;
+import com.JuanAndresFelipe.TiendaApp.dto.ProductsResponseDTO;
+import com.JuanAndresFelipe.TiendaApp.entity.Categories;
 import com.JuanAndresFelipe.TiendaApp.entity.Orders;
 import com.JuanAndresFelipe.TiendaApp.entity.Products;
 import com.JuanAndresFelipe.TiendaApp.entity.Users;
+import com.JuanAndresFelipe.TiendaApp.enums.OrderStatusEnum;
 import com.JuanAndresFelipe.TiendaApp.repository.OrdersRepository;
 import com.JuanAndresFelipe.TiendaApp.repository.ProductsRepository;
 import com.JuanAndresFelipe.TiendaApp.repository.UsersRepository;
@@ -215,6 +220,85 @@ public class OrdersService {
 
         response.setMessage("Estos son los pedidos encontrados.");
         response.setData(listOrders);
+
+        return response;
+    }
+
+
+
+
+    public HttpGlobalResponseDTO<OrdersResponseDTO> editStatusOrder(Long id, ChangeOrdersStatusDTO status, String token) {
+        HttpGlobalResponseDTO<OrdersResponseDTO> response = new HttpGlobalResponseDTO<>();
+        
+        Optional<Orders> orderFound = ordersRepository.findById(id);
+
+        if (orderFound.isEmpty()) {
+            response.setMessage("El I.D. escrito no lo tiene ningún pedido en el sistema.");
+            return response;
+        }
+
+        if (!status.getStatus().equals(OrderStatusEnum.PENDIENTE) || !status.getStatus().equals(OrderStatusEnum.ENVIADO) || !status.getStatus().equals(OrderStatusEnum.ENTREGADO) || !status.getStatus().equals(OrderStatusEnum.CANCELADO)) {
+            response.setMessage("Usuario, el estado que escribió no es válido.");
+            return response;
+        }
+
+        Long sellerId = jwtService.extractUserId(token);
+
+        Optional<Users> userFound = usersRepository.findById(sellerId);
+
+        OrdersResponseDTO orderDTO = new OrdersResponseDTO();
+        Orders order = orderFound.get();
+
+        if (userFound.get().getRole().getId() == 3) {
+
+            if (orderFound.get().getProduct().getSeller().getId() == userFound.get().getId()) {
+                
+                order.setStatus(status.getStatus());
+
+                ordersRepository.save(order);
+
+                orderDTO.setId();
+                orderDTO.setClientId(id);
+                orderDTO.setUsername(token);
+                orderDTO.setProductId(id);
+                orderDTO.setProductName(token);
+                orderDTO.setQuantity(0);
+                orderDTO.setTotal(null);
+                orderDTO.setStatus(null);
+                orderDTO.setCreatedAt(null);
+
+                response.setData(orderDTO);
+                response.setMessage("El estado de la orden ha sido actualizado exitosamente.");
+            
+            } else {
+                
+                response.setMessage("Usuario, usted no puede actualizar el estado de ordenes que no tienen sus productos.");
+                return response;
+            }
+
+        } else if (userFound.get().getRole().getId() == 1) {
+
+            product.setName(registry.getName());
+            product.setDescription(registry.getDescription());
+            product.setPrice(registry.getPrice());
+            product.setStock(registry.getStock());
+            product.setCategory(categoryFound.get());
+
+            productsRepository.save(product);
+
+            productDTO.setId(product.getId());
+            productDTO.setName(product.getName());
+            productDTO.setDescription(product.getDescription());
+            productDTO.setPrice(product.getPrice());
+            productDTO.setStock(product.getStock());
+            productDTO.setCategoryId(product.getCategory().getId());
+            productDTO.setCategoryName(product.getCategory().getName());
+            productDTO.setSellerId(product.getSeller().getId());
+            productDTO.setSellerName(product.getSeller().getUsername());
+
+            response.setData(productDTO);
+            response.setMessage("El producto ha sido actualizado con éxito.");
+        }
 
         return response;
     }
