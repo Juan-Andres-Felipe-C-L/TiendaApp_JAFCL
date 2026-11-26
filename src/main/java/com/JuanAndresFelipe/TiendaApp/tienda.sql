@@ -31,6 +31,7 @@ CREATE TABLE products(
   seller_id int not null,
   foreign key (category_id) references categories (id),
   foreign key (seller_id) references users (id)
+  ON DELETE cascade
 );
  
 CREATE TABLE orders(
@@ -43,6 +44,7 @@ CREATE TABLE orders(
   created_at datetime not null default current_timestamp,
   foreign key (client_id) references users (id),
   foreign key (product_id) references products (id)
+  ON DELETE cascade
 );
 
 -- Se pone sentencia para poder actualizar la información de las tablas, apesar de usar relaciones de Foreign Keys: 

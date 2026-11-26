@@ -257,15 +257,15 @@ public class OrdersService {
 
                 ordersRepository.save(order);
 
-                orderDTO.setId();
-                orderDTO.setClientId(id);
-                orderDTO.setUsername(token);
-                orderDTO.setProductId(id);
-                orderDTO.setProductName(token);
-                orderDTO.setQuantity(0);
-                orderDTO.setTotal(null);
-                orderDTO.setStatus(null);
-                orderDTO.setCreatedAt(null);
+                orderDTO.setId(order.getId());
+                orderDTO.setClientId(order.getClient().getId());
+                orderDTO.setUsername(order.getClient().getUsername());
+                orderDTO.setProductId(order.getProduct().getId());
+                orderDTO.setProductName(order.getProduct().getName());
+                orderDTO.setQuantity(order.getQuantity());
+                orderDTO.setTotal(order.getTotal());
+                orderDTO.setStatus(order.getStatus());
+                orderDTO.setCreatedAt(order.getCreatedAt());
 
                 response.setData(orderDTO);
                 response.setMessage("El estado de la orden ha sido actualizado exitosamente.");
@@ -278,26 +278,22 @@ public class OrdersService {
 
         } else if (userFound.get().getRole().getId() == 1) {
 
-            product.setName(registry.getName());
-            product.setDescription(registry.getDescription());
-            product.setPrice(registry.getPrice());
-            product.setStock(registry.getStock());
-            product.setCategory(categoryFound.get());
+            order.setStatus(status.getStatus());
 
-            productsRepository.save(product);
+                ordersRepository.save(order);
 
-            productDTO.setId(product.getId());
-            productDTO.setName(product.getName());
-            productDTO.setDescription(product.getDescription());
-            productDTO.setPrice(product.getPrice());
-            productDTO.setStock(product.getStock());
-            productDTO.setCategoryId(product.getCategory().getId());
-            productDTO.setCategoryName(product.getCategory().getName());
-            productDTO.setSellerId(product.getSeller().getId());
-            productDTO.setSellerName(product.getSeller().getUsername());
+                orderDTO.setId(order.getId());
+                orderDTO.setClientId(order.getClient().getId());
+                orderDTO.setUsername(order.getClient().getUsername());
+                orderDTO.setProductId(order.getProduct().getId());
+                orderDTO.setProductName(order.getProduct().getName());
+                orderDTO.setQuantity(order.getQuantity());
+                orderDTO.setTotal(order.getTotal());
+                orderDTO.setStatus(order.getStatus());
+                orderDTO.setCreatedAt(order.getCreatedAt());
 
-            response.setData(productDTO);
-            response.setMessage("El producto ha sido actualizado con éxito.");
+                response.setData(orderDTO);
+                response.setMessage("El estado de la orden ha sido actualizado exitosamente.");
         }
 
         return response;
