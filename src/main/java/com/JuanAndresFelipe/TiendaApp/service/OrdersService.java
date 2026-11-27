@@ -11,9 +11,6 @@ import com.JuanAndresFelipe.TiendaApp.dto.ChangeOrdersStatusDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.HttpGlobalResponseDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.OrdersRequestDTO;
 import com.JuanAndresFelipe.TiendaApp.dto.OrdersResponseDTO;
-import com.JuanAndresFelipe.TiendaApp.dto.ProductsRequestDTO;
-import com.JuanAndresFelipe.TiendaApp.dto.ProductsResponseDTO;
-import com.JuanAndresFelipe.TiendaApp.entity.Categories;
 import com.JuanAndresFelipe.TiendaApp.entity.Orders;
 import com.JuanAndresFelipe.TiendaApp.entity.Products;
 import com.JuanAndresFelipe.TiendaApp.entity.Users;
@@ -301,5 +298,69 @@ public class OrdersService {
         }
 
         return response;
+    }
+
+    /**
+     * Método que permite a un cliente cancelar un pedido suyo.
+     * @param id es el I.D. del pedido.
+     * @param token JWT sirve para extraer la información del usuario que hace la petición.
+     * @return un DTO general con la información del pedido y el certificado del éxito de la operación.
+     */
+    public HttpGlobalResponseDTO<OrdersResponseDTO>cancelOrder(Long id, String token) {
+        HttpGlobalResponseDTO<OrdersResponseDTO> response = new HttpGlobalResponseDTO<>();
+        
+        Optional<Orders> orderFound = ordersRepository.findById(id);
+
+        if (orderFound.isEmpty()) {
+            response.setMessage("El I.D. escrito no lo tiene ningún pedido en el sistema.");
+            return response;
+        }
+
+        if (!orderFound.get().getStatus().equals(OrderStatusEnum.PENDIENTE)) {
+            response.setMessage("El status de este pedido no puede ser cambiado.");
+            return response;
+        }
+
+        Long clientId = jwtService.extractUserId(token);
+
+        Optional<Users> userFound = usersRepository.findById(clientId);
+
+        if (userFound.get().getId() == orderFound.get().getClient().getId()) {            
+            Orders order = orderFound.get();
+            Long identificador = order.getProduct().getId();
+            int devolucion = order.getQuantity();
+
+            Optional<Products> productFound = productsRepository.findById(identificador);
+            if (!productFound.isEmpty()) {
+                Products product = productFound.get();
+
+                product.setStock(product.getStock() + devolucion);
+
+                productsRepository.save(product);
+            }
+
+            order.setStatus(OrderStatusEnum.CANCELADO);
+            ordersRepository.save(order);
+
+            OrdersResponseDTO orderDTO = new OrdersResponseDTO();
+            orderDTO.setId(order.getId());
+            orderDTO.setClientId(order.getClient().getId());
+            orderDTO.setUsername(order.getClient().getUsername());
+            orderDTO.setProductId(order.getProduct().getId());
+            orderDTO.setProductName(order.getProduct().getName());
+            orderDTO.setQuantity(order.getQuantity());
+            orderDTO.setTotal(order.getTotal());
+            orderDTO.setStatus(order.getStatus());
+            orderDTO.setCreatedAt(order.getCreatedAt());
+
+            response.setData(orderDTO);
+            response.setMessage("Usuario, su pedido con I.D. número: " + order.getId() + ", ha sido cancelado.");
+            return response;
+
+        } else {
+            response.setMessage("Usuario, usted no puede cancelar ordenes que no sean suyas.");
+            return response;
+        }
+        
     }
 }

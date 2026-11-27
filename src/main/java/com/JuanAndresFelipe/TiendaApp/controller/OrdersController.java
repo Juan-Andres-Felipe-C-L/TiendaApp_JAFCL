@@ -177,4 +177,40 @@ public class OrdersController {
         }
     }
     
+    /**
+     * Método para que un cliente pueda cancelar un pedidio suyo.
+     * @param id es el I.D. del pedido que se quiere cambiar el estado.
+     * @param request es la petición que se utiliza para extraer el JWT token y saber quién es el que está haciendo la petición.
+     * @return un "ResponseEntity" con un DTO general que da la información del producto y la actualización de su estado.
+     */
+    @PatchMapping("/{id}/cancel")
+    @RequiresRole(RoleEnum.CLIENTE)
+    public ResponseEntity<HttpGlobalResponseDTO<OrdersResponseDTO>> cancelOrder(@PathVariable Long id, HttpServletRequest request) {
+        HttpGlobalResponseDTO<OrdersResponseDTO> response = new HttpGlobalResponseDTO<>();
+        
+        String authHeader = request.getHeader("Authorization");
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            response.setMessage("Token invalido.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+
+        String token = authHeader.replace("Bearer ", "");
+        
+        try {
+            response = ordersService.cancelOrder(id, token);
+            if (response.getMessage().equals("El I.D. escrito no lo tiene ningún pedido en el sistema.") || response.getMessage().equals("El status de este pedido no puede ser cambiado.")) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+            } else if (response.getData() == null) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+            } else {
+                return ResponseEntity.status(HttpStatus.CREATED).body(response);
+            }
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
+    
 }
