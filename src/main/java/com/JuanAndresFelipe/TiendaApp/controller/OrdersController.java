@@ -140,11 +140,13 @@ public class OrdersController {
         }
     }
 
-    
-    
-    
-    
-    
+    /**
+     * Método para que los administradores y vendedores puedan cambiar el status de un pedido. Los únicos estados posibles deeben ser "PENDIENTE", "ENVIADO", "ENTREGADO" y "CANCELADO".
+     * @param id es el I.D. del que identifica el pedido.
+     * @param status es el nuevo estado que se le quiere dar al pedido.
+     * @param request es la petición de donde se toma o extrae el JWT token.
+     * @return un "ResponseEntity" que trae la información del pedido, un código Http y un mensaje.
+     */        
     @PatchMapping("/{id}/status")
     @RequiresRole({RoleEnum.ADMIN, RoleEnum.VENDEDOR})
     public ResponseEntity<HttpGlobalResponseDTO<OrdersResponseDTO>> editStatusOrder(@PathVariable Long id, @RequestBody ChangeOrdersStatusDTO status, HttpServletRequest request) {
@@ -161,7 +163,7 @@ public class OrdersController {
         
         try {
             response = ordersService.editStatusOrder(id, status, token);
-            if (response.getMessage().equals("El I.D. escrito no lo tiene ningún producto en el sistema.") || response.getMessage().equals("El I.D. de categoría escrito no existe en el sistema.") || response.getMessage().equals("Usuario, no se le puede poner un precio menor o igual que 0 a un producto.") || response.getMessage().equals("Usuario, no se le puede poner un stock menor o igual que 0 a un producto.")) {
+            if (response.getMessage().equals("El I.D. escrito no lo tiene ningún pedido en el sistema.") || response.getMessage().equals("Usuario, el estado que escribió no es válido.")) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
             } else if (response.getData() == null) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);

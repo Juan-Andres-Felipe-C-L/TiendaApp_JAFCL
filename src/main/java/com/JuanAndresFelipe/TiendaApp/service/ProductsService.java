@@ -355,10 +355,12 @@ public class ProductsService {
         return response;
     }
 
-
-
-
-
+    /**
+     * Método para eliminar un producto registrado en el sistema.
+     * @param id es el identificador de un producto en el sistema.
+     * @param token JWT es de dónde se saca la información del usuario que está haciendo la petición.
+     * @return un DTO general con la información del producto y un mensaje acerca de si se eliminó.
+     */
     public HttpGlobalResponseDTO<ProductsResponseDTO> deleteProduct(Long id, String token) {
         HttpGlobalResponseDTO<ProductsResponseDTO> response = new HttpGlobalResponseDTO<>();
 

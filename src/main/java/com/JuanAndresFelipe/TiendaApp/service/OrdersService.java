@@ -224,9 +224,13 @@ public class OrdersService {
         return response;
     }
 
-
-
-
+    /**
+     * Método para poder cambiar el status a un pedido.
+     * @param id es el I.D. del pedido.
+     * @param status es el DTO para cambiar el nuevo status de la orden.
+     * @param token JWT para poder extraer la información del usuario que está haciendo la petición.
+     * @return un DTO general que brinda la información del pedido y del cambio del status.
+     */
     public HttpGlobalResponseDTO<OrdersResponseDTO> editStatusOrder(Long id, ChangeOrdersStatusDTO status, String token) {
         HttpGlobalResponseDTO<OrdersResponseDTO> response = new HttpGlobalResponseDTO<>();
         
@@ -237,7 +241,7 @@ public class OrdersService {
             return response;
         }
 
-        if (!status.getStatus().equals(OrderStatusEnum.PENDIENTE) || !status.getStatus().equals(OrderStatusEnum.ENVIADO) || !status.getStatus().equals(OrderStatusEnum.ENTREGADO) || !status.getStatus().equals(OrderStatusEnum.CANCELADO)) {
+        if (!status.getStatus().equals(OrderStatusEnum.PENDIENTE) && !status.getStatus().equals(OrderStatusEnum.ENVIADO) && !status.getStatus().equals(OrderStatusEnum.ENTREGADO) && !status.getStatus().equals(OrderStatusEnum.CANCELADO)) {
             response.setMessage("Usuario, el estado que escribió no es válido.");
             return response;
         }
